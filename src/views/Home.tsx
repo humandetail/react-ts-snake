@@ -21,7 +21,7 @@ const Home: FC = () => {
       <Game
         status={ status }
         snakeSize={ snakeSize }
-        level={ Level.NORMAL }
+        level={ Level.HARD }
         canvasSize={ canvasSize }
       />
     </div>

@@ -17,7 +17,13 @@ export enum Direction {
 }
 
 export const speed = {
-  [Level.ESAY]: 1000,
-  [Level.NORMAL]: 500,
-  [Level.HARD]: 300
+  [Level.ESAY]: 500,
+  [Level.NORMAL]: 300,
+  [Level.HARD]: 100
+}
+
+export const itemColor = {
+  // outline: '#d9d9d9',
+  normal: '#ccc',
+  food: '#f5222d'
 }

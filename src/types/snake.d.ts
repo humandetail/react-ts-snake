@@ -11,12 +11,11 @@ export interface ISnakeOptions {
   level: level
 }
 
-export interface ISnakeItem {
+export interface ICoordinate {
   x: number;
   y: number;
 }
 
-export interface IFoodItem {
-  x: number;
-  y: number;
-}
+export type ISnakeItem = ICoordinate;
+
+export type IFoodItem = ICoordinate;

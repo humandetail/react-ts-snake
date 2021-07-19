@@ -36,7 +36,7 @@ class Snake{
     this.canvasSize = canvasSize;
     this.level = level;
     this.speed = speed[this.level];
-    this.gameCanvas = new GameCanvas(el);
+    this.gameCanvas = new GameCanvas(el, this.snakeSize);
 
     this.init();
   }
@@ -61,16 +61,16 @@ class Snake{
 
     this.snake = [
       {
-        x: x - 1,
-        y: y - 1
+        x: x + 1,
+        y
       },
       {
         x,
         y
       },
       {
-        x: x + 1,
-        y: y + 1
+        x: x - 1,
+        y
       },
     ];
   }
@@ -108,7 +108,10 @@ class Snake{
       // 重新生成 food
       this.food = this.genFood();
       return [
-        food,
+        {
+          x: food.x + (dir === Direction.RIGHT ? 1 : dir === Direction.LEFT ? -1 : 0),
+          y: food.y + (dir === Direction.DOWN ? 1 : dir === Direction.UP ? -1 : 0)
+        },
         ...snake
       ];
     }
@@ -189,6 +192,8 @@ class Snake{
     }
 
     this.snake = snake;
+
+    this.gameCanvas.draw(this.snake, this.food!, this.direction);
     console.log(`run ${JSON.stringify(this.snake)}`, this.food);
   }
 
