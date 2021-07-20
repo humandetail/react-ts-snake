@@ -2,12 +2,13 @@
  * Snake
  */
 
-import { Direction, Level, snakeSize, speed } from '../../config/snake.config';
+import { Direction, Level, speed } from '../../config/snake.config';
 import { ISnakeOptions, ISnakeItem, IFoodItem } from '../../types';
+import EventEmitter, { EventCallback } from '../EventEmitter';
 import GameCanvas from '../GameCanvas/GameCanvas';
 import { getRandom } from '../utils/tools';
 
-class Snake{
+class Snake {
   private static instance: Snake | null = null;
 
   protected el: HTMLCanvasElement;
@@ -21,7 +22,11 @@ class Snake{
 
   protected gameCanvas: GameCanvas;
   protected direction: Direction = Direction.RIGHT;
+  // 使用缓存方向来防止用户连按触发调头的 bug
+  protected cachedDirctions: Direction[] = [Direction.RIGHT];
   protected speed: number;
+
+  protected _eventEmitter: EventEmitter;
 
   protected timer: NodeJS.Timeout | null = null; // 动画id
 
@@ -37,6 +42,7 @@ class Snake{
     this.level = level;
     this.speed = speed[this.level];
     this.gameCanvas = new GameCanvas(el, this.snakeSize);
+    this._eventEmitter = new EventEmitter();
 
     this.init();
   }
@@ -93,28 +99,33 @@ class Snake{
     return { x, y };
   }
 
+  // 获取合法的方向值
+  getDirection (): Direction {
+    const current = this.direction;
+    const cachedDirctions = this.cachedDirctions;
+
+    const illegalMap = {
+      [Direction.UP]: Direction.DOWN,
+      [Direction.DOWN]: Direction.UP,
+      [Direction.LEFT]: Direction.RIGHT,
+      [Direction.RIGHT]: Direction.LEFT
+    }
+
+    let last = cachedDirctions.pop() || current;
+    if (illegalMap[current] === last) {
+      console.log('1', Direction[current]);
+      last = current;
+    }
+
+    this.direction = last;
+    this.cachedDirctions = [last];
+    return last;
+  }
+
   protected getNextSnake (): ISnakeItem[] | null {
     const dir = this.direction;
     const snake = this.snake;
     const food = this.food!;
-
-    if (this.isEncounterBoudary(snake)) {
-      this.finish();
-      this.publish('UPDATE_STATUS', 'GAME_OVER');
-      return null;
-    }
-
-    if (this.isEncounterFood(snake[0], food, dir)) {
-      // 重新生成 food
-      this.food = this.genFood();
-      return [
-        {
-          x: food.x + (dir === Direction.RIGHT ? 1 : dir === Direction.LEFT ? -1 : 0),
-          y: food.y + (dir === Direction.DOWN ? 1 : dir === Direction.UP ? -1 : 0)
-        },
-        ...snake
-      ];
-    }
 
     const { x, y } = snake[0];
     let head: ISnakeItem;
@@ -133,13 +144,33 @@ class Snake{
         head = { x: x - 1, y };
         break;
       default:
-        break;
+        throw new Error('Invalid direction');
     }
 
-    return [
-      head!,
+    if (this.isEncounterFood(head, food)) {
+      // 重新生成 food
+      this.food = this.genFood();
+      return [
+        {
+          x: food.x,
+          y: food.y
+        },
+        ...snake
+      ];
+    }
+
+    const newSnake = [
+      head,
       ...snake.slice(0, -1)
-    ]
+    ];
+
+    if (this.isEncounterBoudary(snake)) {
+      this.finish();
+      this.publish('UPDATE_STATUS', 'FINISH');
+      return null;
+    }
+
+    return newSnake;
   }
 
   protected isEncounterBoudary (snake: ISnakeItem[]): boolean {
@@ -147,17 +178,17 @@ class Snake{
     const [maxX, maxY] = this.canvasSize;
 
     if (
-      x === 0 || x === maxX ||
-      y === 0 || y === maxY
+      x <= 0 || x >= maxX ||
+      y <= 0 || y >= maxY
     ) {
-      return false;
+      return true;
     }
     
     // 触碰自身其它位置
     return body.some((item) => item.x === x && item.y === y);
   }
 
-  protected isEncounterFood (head: ISnakeItem, food: IFoodItem, dir: Direction): boolean {
+  protected isEncounterFood (head: ISnakeItem, food: IFoodItem): boolean {
     return head.x === food.x && head.y === food.y;
   }
 
@@ -166,19 +197,16 @@ class Snake{
 
     switch (key) {
       case 'ArrowUp':
-        this.direction = Direction.UP;
+        this.cachedDirctions.push(Direction.UP);
         break;
       case 'ArrowRight':
-        this.direction = Direction.RIGHT;
+        this.cachedDirctions.push(Direction.RIGHT);
         break;
       case 'ArrowDown':
-        this.direction = Direction.DOWN;
+        this.cachedDirctions.push(Direction.DOWN);
         break;
       case 'ArrowLeft':
-        this.direction = Direction.LEFT;
-        break;
-      case ' ':
-        this.publish('UPDATE_STATUS', 'PAUSE');
+        this.cachedDirctions.push(Direction.LEFT);
         break;
       default:
         break;
@@ -186,6 +214,7 @@ class Snake{
   }
 
   protected run () {
+    this.getDirection();
     const snake = this.getNextSnake();
     if (!snake) {
       return false;
@@ -193,8 +222,8 @@ class Snake{
 
     this.snake = snake;
 
-    this.gameCanvas.draw(this.snake, this.food!, this.direction);
-    console.log(`run ${JSON.stringify(this.snake)}`, this.food);
+    // this.gameCanvas.draw(this.snake, this.food!, this.direction);
+    console.log(`run ${JSON.stringify(this.snake)}`, this.food, Direction[this.direction], this.cachedDirctions);
   }
 
   start () {
@@ -225,8 +254,16 @@ class Snake{
     }
   }
 
-  publish (action: string, status: string) {
-    console.log(action, status);
+  addSubscribe (topic: string, callback: EventCallback) {
+    this._eventEmitter.on(topic, callback);
+  }
+
+  removeSubscribe (topic: string, callback: EventCallback) {
+    this._eventEmitter.off(topic, callback);
+  }
+
+  publish (topic: string, status: string) {
+    this._eventEmitter.emit(topic, status);
   }
 
   addKeyboardListener () {

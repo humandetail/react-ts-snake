@@ -5,6 +5,13 @@
   transform: translate(-50%, -50%);
 
   .canvas {
+    display: block;
     box-shadow: 0 0 8px #888;
+  }
+
+  .back {
+    width: 32px;
+    height: 32px;
+    background: url('../../../public/back.svg');
   }
 }
