@@ -11,3 +11,10 @@ export interface IGameProps {
   level: Level;
   setStatus: (status: GameStatus) => void
 }
+
+export interface IHeaderProps {
+  hasBack?: boolean;
+  goBack?: () => void;
+  title: string;
+  level: Level;
+}

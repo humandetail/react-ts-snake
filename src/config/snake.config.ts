@@ -9,6 +9,12 @@ export enum Level {
   HARD = 'HARD'
 }
 
+export const levelText = {
+  [Level.ESAY]: '简单模式',
+  [Level.NORMAL]: '普通模式',
+  [Level.HARD]: '困难模式'
+}
+
 export enum Direction {
   UP = 1,
   RIGHT = 2,
@@ -24,6 +30,6 @@ export const speed = {
 
 export const itemColor = {
   // outline: '#d9d9d9',
-  normal: '#ccc',
+  normal: '#333',
   food: '#f5222d'
 }

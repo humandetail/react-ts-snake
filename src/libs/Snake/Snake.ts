@@ -130,6 +130,12 @@ class Snake {
     const { x, y } = snake[0];
     let head: ISnakeItem;
 
+    if (this.isEncounterBoudary(snake, dir)) {
+      this.finish();
+      this.publish('UPDATE_STATUS', 'FINISH');
+      return null;
+    }
+
     switch (dir) {
       case Direction.UP:
         head = { x, y: y - 1 };
@@ -164,18 +170,29 @@ class Snake {
       ...snake.slice(0, -1)
     ];
 
-    if (this.isEncounterBoudary(snake)) {
-      this.finish();
-      this.publish('UPDATE_STATUS', 'FINISH');
-      return null;
-    }
-
     return newSnake;
   }
 
-  protected isEncounterBoudary (snake: ISnakeItem[]): boolean {
-    const [{ x, y }, ...body] = snake;
+  protected isEncounterBoudary (snake: ISnakeItem[], dir: Direction): boolean {
+    let [{ x, y }, ...body] = snake;
     const [maxX, maxY] = this.canvasSize;
+
+    switch (dir) {
+      case Direction.UP:
+        y -= 1;
+        break;
+      case Direction.DOWN:
+        y += 1;
+        break;
+      case Direction.LEFT:
+        x -= 1;
+        break;
+      case Direction.RIGHT:
+        x += 1;
+        break;
+      default:
+        throw new Error('Invalid direction');
+    }
 
     if (
       x <= 0 || x >= maxX ||
@@ -222,7 +239,7 @@ class Snake {
 
     this.snake = snake;
 
-    // this.gameCanvas.draw(this.snake, this.food!, this.direction);
+    this.gameCanvas.draw(this.snake, this.food!, this.direction);
     console.log(`run ${JSON.stringify(this.snake)}`, this.food, Direction[this.direction], this.cachedDirctions);
   }
 
