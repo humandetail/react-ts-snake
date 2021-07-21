@@ -2,7 +2,7 @@ import {
   Level
 } from '../config/snake.config'
 
-export type GameStatus = 'LOADING' | 'LOADED' | 'PLAYING' | 'PAUSE' | 'FINISH';
+export type GameStatus = 'LOADING' | 'LOADED' | 'START' | 'PLAYING' | 'PAUSE' | 'FINISH';
 
 export interface IGameProps {
   status: GameStatus;

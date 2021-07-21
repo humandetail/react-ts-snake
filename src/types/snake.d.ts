@@ -4,7 +4,14 @@
 
 import { level } from "../config/snake.config";
 
-export interface ISnakeOptions {
+// export interface ISnakeOptions {
+//   el: HTMLCanvasElement,
+//   snakeSize: number;
+//   canvasSize: [number, number],
+//   level: level
+// }
+
+export interface ISnakeInitOptions {
   el: HTMLCanvasElement,
   snakeSize: number;
   canvasSize: [number, number],

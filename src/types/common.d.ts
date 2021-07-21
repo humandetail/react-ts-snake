@@ -4,6 +4,7 @@
 
 import React from "react";
 import { Level } from "../config/snake.config";
+import { GameStatus } from "./game";
 
 export type ButtonType = 'default' | 'primary' | 'success' | 'warning' | 'danger';
 export interface IButtonProps {
@@ -29,7 +30,13 @@ export interface IModalProps {
 }
 
 export type IConfirmModalProps = IModalProps;
+export type IAlertModalProps = IModalProps;
 
 export interface ILevelBoardProps {
   changeLevel: (level: Level) => void;
+}
+
+export interface IGameOverProps {
+  setStatus: (status: GameStatus) => void;
+  setLevelBoardVisible: (visible: boolean) => void;
 }

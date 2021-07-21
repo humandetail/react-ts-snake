@@ -56,8 +56,9 @@
         box-sizing: border-box;
         border: none;
         outline: none;
-        background-color: #fff;
         font-size: 14px;
+        text-align: center;
+        background-color: #fff;
         cursor: pointer;
 
         &:not(:first-child) {
@@ -80,6 +81,12 @@
           }
         }
       }
+    }
+  }
+
+  &.Alert-modal {
+    .wrapper .footer .btn {
+      width: 100%;
     }
   }
 }

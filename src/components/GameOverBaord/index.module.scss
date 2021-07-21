@@ -1,9 +1,15 @@
-.home {
+.game-over-board {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex: 1;
+  padding: 16px;
+
+  .tips {
+    text-align: center;
+    font-weight: 700;
+    font-size: 18px;
+  }
 
   button:not(:first-child) {
     margin-top: 16px;

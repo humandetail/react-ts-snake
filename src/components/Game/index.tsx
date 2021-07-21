@@ -24,14 +24,10 @@ const Game: FC<IGameProps> = ({ status, snakeSize, canvasSize, level, setStatus 
   useEffect(() => {
     const oCanvas = canvasRef.current;
 
-    const snake = Snake.getSnake({
-      el: oCanvas!,
-      snakeSize: snakeSize,
-      canvasSize: canvasSize,
-      level
-    });
+    const snake = Snake.getSnake();
 
     snake.addSubscribe('UPDATE_STATUS', setStatus);
+    console.log(status)
 
     switch (status) {
       case 'PLAYING':
@@ -42,6 +38,16 @@ const Game: FC<IGameProps> = ({ status, snakeSize, canvasSize, level, setStatus 
         break;
       case 'FINISH':
         snake.finish();
+        break;
+      case 'START':
+        snake.init({
+          el: oCanvas!,
+          snakeSize: snakeSize,
+          canvasSize: canvasSize,
+          level
+        }).then(() => {
+          setStatus('PLAYING');
+        })
         break;
       default:
         break;

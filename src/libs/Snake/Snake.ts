@@ -3,7 +3,7 @@
  */
 
 import { Direction, Level, speed } from '../../config/snake.config';
-import { ISnakeOptions, ISnakeItem, IFoodItem } from '../../types';
+import { ISnakeItem, IFoodItem, ISnakeInitOptions } from '../../types';
 import EventEmitter, { EventCallback } from '../EventEmitter';
 import GameCanvas from '../GameCanvas/GameCanvas';
 import { getRandom } from '../utils/tools';
@@ -11,53 +11,56 @@ import { getRandom } from '../utils/tools';
 class Snake {
   private static instance: Snake | null = null;
 
-  protected el: HTMLCanvasElement;
+  protected el!: HTMLCanvasElement;
 
   protected snake: ISnakeItem[] = [];
   protected food: IFoodItem | null = null;
 
-  protected snakeSize: number;
-  protected canvasSize: [number, number];
-  protected level: Level;
+  protected snakeSize!: number;
+  protected canvasSize!: [number, number];
+  protected level!: Level;
 
-  protected gameCanvas: GameCanvas;
+  protected gameCanvas!: GameCanvas;
   protected direction: Direction = Direction.RIGHT;
   // 使用缓存方向来防止用户连按触发调头的 bug
   protected cachedDirctions: Direction[] = [Direction.RIGHT];
-  protected speed: number;
+  protected speed!: number;
 
   protected _eventEmitter: EventEmitter;
 
   protected timer: NodeJS.Timeout | null = null; // 动画id
 
-  private constructor ({
+  private constructor () {
+    this._eventEmitter = new EventEmitter();
+  }
+
+  static getSnake () {
+    if (Snake.instance === null) {
+      Snake.instance = new Snake();
+    }
+    
+    return Snake.instance;
+  }
+
+  public init ({
     el,
     snakeSize,
     canvasSize,
     level
-  }: ISnakeOptions) {
+  }: ISnakeInitOptions): Promise<void> {
     this.el = el;
     this.snakeSize = snakeSize;
     this.canvasSize = canvasSize;
     this.level = level;
     this.speed = speed[this.level];
     this.gameCanvas = new GameCanvas(el, this.snakeSize);
-    this._eventEmitter = new EventEmitter();
+    this.direction = Direction.RIGHT;
+    this.cachedDirctions = [];
 
-    this.init();
-  }
-
-  static getSnake (opts: ISnakeOptions) {
-    if (Snake.instance === null) {
-      Snake.instance = new Snake(opts);
-    }
-    
-    return Snake.instance;
-  }
-
-  protected init () {
     this.initSnake();
-    this.genFood();
+    this.food = this.genFood();
+
+    return Promise.resolve();
   }
 
   protected initSnake () {
@@ -195,8 +198,8 @@ class Snake {
     }
 
     if (
-      x <= 0 || x >= maxX ||
-      y <= 0 || y >= maxY
+      x < 0 || x >= maxX ||
+      y < 0 || y >= maxY
     ) {
       return true;
     }
@@ -239,7 +242,7 @@ class Snake {
 
     this.snake = snake;
 
-    // this.gameCanvas.draw(this.snake, this.food!, this.direction);
+    this.gameCanvas.draw(this.snake, this.food!, this.direction);
     console.log(`run ${JSON.stringify(this.snake)}`, this.food, Direction[this.direction], this.cachedDirctions);
   }
 

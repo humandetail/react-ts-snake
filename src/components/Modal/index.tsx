@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { IModalProps } from '../../types';
 
 import styles from './index.module.scss';
@@ -33,8 +34,8 @@ const Modal: FC<IModalProps> = ({
     return null;
   }
 
-  return (
-    <div className={ `${styles.modal} ${type + '-modal'}` }>
+  return ReactDOM.createPortal((
+    <div className={ `${styles.modal} ${type ? styles[type + '-modal'] : ''}` }>
       <div className={ styles.mask }></div>
       <div className={ styles.container }>
         <div className={ styles.wrapper }>
@@ -58,18 +59,22 @@ const Modal: FC<IModalProps> = ({
                   onClick={ handleOk }>
                   { okText || '确认' }
                 </button>
-                <button
-                  className={ `${styles.btn} ${styles['btn-cancel']}` }
-                  onClick={ handleCancel }>
-                  { cancelText || '取消' }
-                </button>
+                {
+                  type !== 'Alert' && (
+                    <button
+                      className={ `${styles.btn} ${styles['btn-cancel']}` }
+                      onClick={ handleCancel }>
+                      { cancelText || '取消' }
+                    </button>
+                  )
+                }
               </footer>
             )
           }
         </div>
       </div>
     </div>
-  );
+  ), document.body);
 }
 
 export default Modal;

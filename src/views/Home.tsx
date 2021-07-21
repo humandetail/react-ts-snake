@@ -13,9 +13,10 @@ import Game from '../components/Game';
 import LevelBoard from '../components/LevelBoard';
 import Button from '../components/Button';
 import Loading from '../components/Loading';
-import Confirm from '../components/Modal/Confirm';
+import Alert from '../components/Modal/Alert';
 
 import styles from '../assets/styles/home.module.scss';
+import GameOverBoard from '../components/GameOverBaord';
 
 const Home: FC = () => {
   const [status, setStatus] = useState<GameStatus>('LOADING');
@@ -25,7 +26,7 @@ const Home: FC = () => {
   useEffect(() => {
     setTimeout(() => {
       setStatus('LOADED');
-    }, 1000);
+    }, 500);
   }, []);
 
   function handleChangeLevel (lev: Level) {
@@ -58,13 +59,13 @@ const Home: FC = () => {
               <div className={ styles.home }>
                 <Button
                   type="success"
-                  onClick={ () => setStatus('PLAYING') }>
-                  START
+                  onClick={ () => setStatus('START') }>
+                  开始游戏
                 </Button>
                 <Button
                   type="primary"
                   onClick={ () => setBoardVisible(true) }>
-                  SELECT MODE
+                  选择难度
                 </Button>
               </div>
             </>
@@ -81,22 +82,20 @@ const Home: FC = () => {
 
               {
                 status === 'PAUSE' && (
-                  <Confirm
+                  <Alert
                     visible={ true }
-                    content="PAUSE"
-                    onOk={ () => console.log('Confirm') }
-                    onCancel={ () => console.log('Cancel') }
+                    content="暂停游戏中"
+                    okText="继续"
+                    onOk={ () => setStatus('PLAYING') }
                   />
                 )
               }
 
               {
                 status === 'FINISH' && (
-                  <Confirm
-                    visible={ true }
-                    content="Game over!"
-                    onOk={ () => console.log('Confirm') }
-                    onCancel={ () => console.log('Cancel') }
+                  <GameOverBoard
+                    setStatus={ setStatus }
+                    setLevelBoardVisible={ setBoardVisible }
                   />
                 )
               }
