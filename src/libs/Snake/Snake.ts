@@ -239,7 +239,7 @@ class Snake {
 
     this.snake = snake;
 
-    this.gameCanvas.draw(this.snake, this.food!, this.direction);
+    // this.gameCanvas.draw(this.snake, this.food!, this.direction);
     console.log(`run ${JSON.stringify(this.snake)}`, this.food, Direction[this.direction], this.cachedDirctions);
   }
 

@@ -1,0 +1,11 @@
+.level-board {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+
+  button:not(:first-child) {
+    margin-top: 16px;
+  }
+}

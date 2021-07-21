@@ -1,7 +1,4 @@
-$primary-color: #0070f3;
-$success-color: #52c41a;
-$warning-color: #faad14;
-$danger-color: #f5222d;
+@import '../../assets//styles/variables.scss';
 
 .btn {
   display: flex;

@@ -1,0 +1,21 @@
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+
+  .icon {
+    transform-origin: center center;
+    animation: spinning 1.2s linear infinite;
+  }
+}
+
+@keyframes spinning {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(1turn);
+  }
+}

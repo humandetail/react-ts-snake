@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import {
   snakeSize,
@@ -6,56 +6,104 @@ import {
   canvasSize
 } from '../config/snake.config';
 
-import Game from '../components/Game';
-import Button from '../components/Button';
 import { GameStatus } from '../types';
+
+import Header from '../components/Header';
+import Game from '../components/Game';
+import LevelBoard from '../components/LevelBoard';
+import Button from '../components/Button';
+import Loading from '../components/Loading';
+import Confirm from '../components/Modal/Confirm';
+
+import styles from '../assets/styles/home.module.scss';
 
 const Home: FC = () => {
   const [status, setStatus] = useState<GameStatus>('LOADING');
+  const [level, setLevel] = useState<Level>(Level.ESAY);
+  const [boardVisible, setBoardVisible] = useState<boolean>(false);
 
-  // setTimeout(() => {
-  //   setStauts('PAUSE')
-  // }, 3000);
-  if (status === 'LOADING') {
+  useEffect(() => {
     setTimeout(() => {
       setStatus('LOADED');
     }, 1000);
-    return <div>Loading</div>
+  }, []);
+
+  function handleChangeLevel (lev: Level) {
+    setLevel(lev);
+    setBoardVisible(false);
   }
 
-  if (status === 'LOADED') {
+  if (status === 'LOADING') {
     return (
-      <div>
-        <h1>Home</h1>
-        <Button onClick={ () => setStatus('PLAYING') }>BUTTON A</Button>
-        <br />
-        <Button type="primary">BUTTON B</Button>
-        <br />
-        <Button type="danger">BUTTON C</Button>
-        <br />
-        <Button type="warning">BUTTON D</Button>
-        <br />
-        <Button type="success">BUTTON E</Button>
-      </div>
-    );
+      <Loading />
+    )
   }
 
   return (
-    <div>
-      <Game
-        status={ status }
-        snakeSize={ snakeSize }
-        level={ Level.HARD }
-        canvasSize={ canvasSize }
-        setStatus={ setStatus }
+    <>
+      <Header
+        hasBack={ status !== 'LOADED' }
+        goBack={ () => setStatus('LOADED') }
+        title="这是标题"
+        level={ level }
       />
+      {
+        boardVisible && <LevelBoard changeLevel={ handleChangeLevel }/>
+      }
 
       {
-        status === 'FINISH' && (
-          <div>Game over</div>
-        )
+        status === 'LOADED'
+          ? (
+            <>
+              <div className={ styles.home }>
+                <Button
+                  type="success"
+                  onClick={ () => setStatus('PLAYING') }>
+                  START
+                </Button>
+                <Button
+                  type="primary"
+                  onClick={ () => setBoardVisible(true) }>
+                  SELECT MODE
+                </Button>
+              </div>
+            </>
+          )
+          : (
+            <>
+              <Game
+                status={ status }
+                snakeSize={ snakeSize }
+                level={ level }
+                canvasSize={ canvasSize }
+                setStatus={ setStatus }
+              />
+
+              {
+                status === 'PAUSE' && (
+                  <Confirm
+                    visible={ true }
+                    content="PAUSE"
+                    onOk={ () => console.log('Confirm') }
+                    onCancel={ () => console.log('Cancel') }
+                  />
+                )
+              }
+
+              {
+                status === 'FINISH' && (
+                  <Confirm
+                    visible={ true }
+                    content="Game over!"
+                    onOk={ () => console.log('Confirm') }
+                    onCancel={ () => console.log('Cancel') }
+                  />
+                )
+              }
+            </>
+          )
       }
-    </div>
+    </>
   );
 }
 

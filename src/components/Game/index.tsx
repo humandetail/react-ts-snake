@@ -1,8 +1,6 @@
 import React, { FC, useEffect, useRef } from 'react';
 import { IGameProps } from '../../types';
 
-import Header from './Header';
-
 import Snake from '../../libs/Snake/Snake';
 import styles from './index.module.scss';
 
@@ -57,12 +55,6 @@ const Game: FC<IGameProps> = ({ status, snakeSize, canvasSize, level, setStatus 
 
   return (
     <div className={ styles.container }>
-      <Header
-        hasBack={ true }
-        goBack={ () => setStatus('LOADED') }
-        title="贪吃小蛇"
-        level={ level }
-      />
       <section className={ styles.wrapper }>
         <canvas
           ref={ canvasRef }
